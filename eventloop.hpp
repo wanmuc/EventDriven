@@ -1,12 +1,14 @@
 #pragma once
 
-#include "event.hpp"
 #include "epollctl.hpp"
+#include "event.hpp"
 #include "timer.hpp"
 #include <cstdint>
 #include <string>
 #include <sys/epoll.h>
+#include <unistd.h>
 #include <unordered_map>
+#include <utility>
 
 using namespace std;
 
@@ -48,7 +50,7 @@ public:
         sleep(0);  // 这里直接sleep(0)让出cpu。大概率被挂起，这里主动让出cpu，可以减少一次epoll_wait的调用
         msec = -1;  // 大概率被挂起，故这里超时时间设置为-1
       } else {
-        mesc = 0;  // 下次大概率还有事件，故mesc设置为0
+        msec = 0;  // 下次大概率还有事件，故msec设置为0
       }
       for (int i = 0; i < event_num; i++) {
         Event *event = (Event *)events[i].data.ptr;

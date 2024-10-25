@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include <sys/epoll.h>
 #include <unordered_map>
 

@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unordered_set>
+#include <utility>
 
 namespace EventDriven {
 typedef struct TimerData {
@@ -24,12 +25,12 @@ public:
   uint64_t Register(int64_t time_out_ms, Function &&handler, Args &&...args) {
     alloc_id_++;
     TimerData timer_data;
-    timerData.id = alloc_id_;
-    timerData.abs_time_ms = GetCurrentTimeMs() + time_out_ms;
-    timerData.handler = bind(forward<Function>(handler), forward<Args>(args)...);
+    timer_data.id = alloc_id_;
+    timer_data.abs_time_ms = GetCurrentTimeMs() + time_out_ms;
+    timer_data.handler = bind(forward<Function>(handler), forward<Args>(args)...);
     timers_.push(timer_data);
-    timer_ids_.insert(timerData.id);
-    return timerData.id;
+    timer_ids_.insert(timer_data.id);
+    return timer_data.id;
   }
 
   void Cancel(uint64_t id) {
