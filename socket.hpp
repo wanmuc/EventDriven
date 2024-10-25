@@ -1,8 +1,10 @@
 #pragma once
 
-#include <string>
-#include <string.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <string.h>
+#include <string>
+#include <unistd.h>
 
 namespace EventDriven {
 class Socket {
