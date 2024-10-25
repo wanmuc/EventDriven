@@ -3,12 +3,14 @@
 #include "epollctl.hpp"
 #include "event.hpp"
 #include "timer.hpp"
+#include "socket.hpp"
 #include <cstdint>
 #include <string>
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <unordered_map>
 #include <utility>
+#include <list>
 
 using namespace std;
 
@@ -19,7 +21,25 @@ public:
     epoll_fd_ = epoll_create(1);
     assert(epoll_fd_ > 0);
   }
-  void TcpListenStart(string ip, uint16_t port);
+  ~EventLoop() {
+    while (not listen_events_.empty()) {
+      Event * event = listen_events_.front();
+      listen_events_.pop_front();
+      delete event;
+    }
+  }
+  void TcpListenStart(string ip, uint16_t port, function<void(Event * event)> accept_client) {
+    Event * event = new Event;
+    event->fd = Socket::CreateListenSocket(ip, port);
+    event->epoll_fd = epoll_fd_;
+    event->events = 0;
+    event->type = EventType::kListenConnect;
+    event->handler = accept_client;
+    Socket::SetNotBlock(event->fd);
+    EpollCtl::AddReadEvent(event->epoll_fd, event->fd, event);
+    listen_events_.push_back(event);
+  }
+
   void TcpReadStart(int fd);
   void TcpWriteStart(int fd);
   void UnixSocketListenStart(string patch);
@@ -62,7 +82,8 @@ public:
   }
 
 private:
-  Timer timer_;  // 定时器
-  int epoll_fd_;  // epoll的fd
+  Timer timer_;                 // 定时器
+  int epoll_fd_;                // epoll的fd
+  list<Event *> listen_events_; // 为监听而创建的事件对象列表
 };
 } // namespace EventDriven
