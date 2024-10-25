@@ -28,7 +28,7 @@ public:
 
   template <typename Function, typename... Args>
   uint64_t TimerStart(int64_t time_out_ms,  Function && handler, Args &&...args) {
-    return timer_.Register(forward<Function>(handler), forward<Args>(args)...);
+    return timer_.Register(time_out_ms, forward<Function>(handler), forward<Args>(args)...);
   }
 
   void Run() {
