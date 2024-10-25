@@ -21,12 +21,12 @@ typedef struct TimerData {
 class Timer {
 public:
   template <typename Function, typename... Args>
-  uint64_t Register(int64_t time_out_ms, Function &&func, Args &&...args) {
+  uint64_t Register(int64_t time_out_ms, Function &&handler, Args &&...args) {
     alloc_id_++;
     TimerData timer_data;
     timerData.id = alloc_id_;
     timerData.abs_time_ms = GetCurrentTimeMs() + time_out_ms;
-    timerData.handler = bind(forward<Function>(func), forward<Args>(args)...);
+    timerData.handler = bind(forward<Function>(handler), forward<Args>(args)...);
     timers_.push(timer_data);
     timer_ids_.insert(timerData.id);
     return timerData.id;

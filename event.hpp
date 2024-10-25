@@ -16,6 +16,6 @@ typedef struct Event {
   int epoll_fd;                  // epoll描述符
   uint32_t events;               // epoll触发的具体事件
   EventType type;                // 事件类型
-  std::function<void()> handler; // 事件处理函数
+  std::function<void(Event *event)> handler; // 事件处理函数
 } Event;
 } // namespace EventDriven

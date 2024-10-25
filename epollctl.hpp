@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sys/epoll.h>
 #include <unordered_map>
 
 namespace EventDriven {
