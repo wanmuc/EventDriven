@@ -27,7 +27,7 @@ public:
     TimerData timer_data;
     timer_data.id = alloc_id_;
     timer_data.abs_time_ms = GetCurrentTimeMs() + time_out_ms;
-    timer_data.handler = bind(forward<Function>(handler), forward<Args>(args)...);
+    timer_data.handler = std::bind(std::forward<Function>(handler), std::forward<Args>(args)...);
     timers_.push(timer_data);
     timer_ids_.insert(timer_data.id);
     return timer_data.id;
