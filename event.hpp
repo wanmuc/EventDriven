@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint> 
-#include <function>
+#include <functional>
 
 namespace EventDriven {
 enum class EventType {

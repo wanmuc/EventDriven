@@ -2,7 +2,7 @@
 
 #include <assert.h>
 #include <cstdint>
-#include <function>
+#include <functional>
 #include <queue>
 #include <sys/time.h>
 #include <time.h>
