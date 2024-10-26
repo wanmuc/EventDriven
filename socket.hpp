@@ -19,7 +19,7 @@ class Socket {
       perror("inet_pton failed");
       assert(0);
     }
-    int socket_fd = socket(AF_INET, SOCK_STREAM ｜ SOCK_NONBLOCK, 0);  // 直接创建非阻塞的 socket fd
+    int socket_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);  // 直接创建非阻塞的 socket fd
     assert(socket_fd >= 0);
     int reuse = 1;
     if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)) != 0) {
