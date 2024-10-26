@@ -16,35 +16,36 @@ EventLoop::~EventLoop() {
 }
 
 void EventLoop::Run() {
-  int msec = -1;
+  int time_out_ms = -1;
   TimerData timer_data;
   bool has_timer{false};
-  epoll_event events[1024];
+  constexpr int32_t kEventNum = 1024;
+  epoll_event events[kEventNum];
   while (is_running_) {
     has_timer = timer_.GetLastTimer(timer_data);
     if (has_timer) {
-      msec = timer_.TimeOutMs(timer_data);
+      time_out_ms = timer_.TimeOutMs(timer_data);
     }
-    int event_num = epoll_wait(epoll_fd_, events, 1024, msec);
+    int event_num = epoll_wait(epoll_fd_, events, kEventNum, time_out_ms);
     if (event_num < 0) {
       perror("epoll_wait failed");
       continue;
     }
-    if (event_num == 0) { // 没有事件了，下次调用epoll_wait大概率被挂起
-      sleep(0); // 这里直接sleep(0)让出cpu。大概率被挂起，这里主动让出cpu，可以减少一次epoll_wait的调用
-      msec = -1; // 大概率被挂起，故这里超时时间设置为-1
+    if (event_num == 0) {  // 没有事件了，下次调用epoll_wait大概率被挂起
+      sleep(0);  // 这里直接sleep(0)让出cpu。大概率被挂起，这里主动让出cpu，可以减少一次epoll_wait的调用
+      time_out_ms = -1;  // 大概率被挂起，故这里超时时间设置为-1
     } else {
-      msec = 0; // 下次大概率还有事件，故msec设置为0
+      time_out_ms = 0;  // 下次大概率还有事件，故time_out_ms设置为0
     }
     for (int i = 0; i < event_num; i++) {
       Event *event = (Event *)events[i].data.ptr;
       event->events = events[i].events;
       event->handler(event);
     }
-    if (has_timer) timer_.Run(timer_data); // 定时器放在最后处理
+    if (has_timer) timer_.Run(timer_data);  // 定时器放在最后处理
   }
 }
 
 void EventLoop::Stop() { is_running_ = false; }
 
-} // namespace EventDriven
+}  // namespace EventDriven
